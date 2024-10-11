@@ -114,15 +114,15 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex">
+    <div className="min-h-screen bg-gray-900 text-white flex flex-col sm:flex-row">
       {/* Sidebar */}
-      <div className="w-1/4 p-8 bg-gray-800">
-        <h2 className="text-2xl font-bold mb-4">Informações</h2>
-        <p className="mb-2">
+      <div className="w-full sm:w-1/4 p-4 sm:p-8 bg-gray-800">
+        <h2 className="text-xl sm:text-2xl font-bold mb-4">Informações</h2>
+        <p className="mb-2 text-sm sm:text-base">
           Valor Total Investido: {formatCurrencyFromCents(totalInvestido * 100)}
         </p>
         <div className="mb-4">
-          <label className="block mb-2">Valor do Aporte</label>
+          <label className="block mb-2 text-sm sm:text-base">Valor do Aporte</label>
           <input
             type="text"
             className="w-full p-2 rounded bg-gray-700 text-white"
@@ -135,171 +135,174 @@ export default function Dashboard() {
         </div>
         {/* Mensagem de aviso se a soma dos percentuais ideais não for 100% */}
         {mensagemAviso && (
-          <div className="text-yellow-400 mb-4">{mensagemAviso}</div>
+          <div className="text-yellow-400 mb-4 text-sm sm:text-base">{mensagemAviso}</div>
         )}
         {/* Gráfico */}
         <div className="mt-6">
-          <h3 className="text-xl font-bold mb-2">Distribuição Atual</h3>
-          <Pie
-            data={{
-              labels: categorias,
-              datasets: [
-                {
-                  data: valoresAtuais.map((val) => val / 100), // Converte centavos para reais
-                  backgroundColor: [
-                    '#1f77b4',
-                    '#ff7f0e',
-                    '#2ca02c',
-                    '#d62728',
-                    '#9467bd',
-                  ],
-                },
-              ],
-            }}
-            options={{
-              plugins: {
-                datalabels: {
-                  color: 'white',
-                  formatter: function (value, context) {
-                    const index = context.dataIndex;
-                    const percentual = percentuaisAtuais[index];
-                    return percentual.toFixed(2) + '%';
+          <h3 className="text-lg sm:text-xl font-bold mb-2">Distribuição Atual</h3>
+          <div className="h-64 sm:h-auto">
+            <Pie
+              data={{
+                labels: categorias,
+                datasets: [
+                  {
+                    data: valoresAtuais.map((val) => val / 100), // Converte centavos para reais
+                    backgroundColor: [
+                      '#1f77b4',
+                      '#ff7f0e',
+                      '#2ca02c',
+                      '#d62728',
+                      '#9467bd',
+                    ],
                   },
-                },
-                tooltip: {
-                  callbacks: {
-                    label: function (context) {
+                ],
+              }}
+              options={{
+                maintainAspectRatio: false,
+                plugins: {
+                  datalabels: {
+                    color: 'white',
+                    formatter: function (value, context) {
                       const index = context.dataIndex;
-                      const valor = valoresAtuais[index] / 100;
                       const percentual = percentuaisAtuais[index];
-                      return (
-                        categorias[index] +
-                        ': R$ ' +
-                        valor.toLocaleString('pt-BR', {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        }) +
-                        ' (' +
-                        percentual.toFixed(2) +
-                        '%)'
-                      );
+                      return percentual.toFixed(2) + '%';
+                    },
+                  },
+                  tooltip: {
+                    callbacks: {
+                      label: function (context) {
+                        const index = context.dataIndex;
+                        const valor = valoresAtuais[index] / 100;
+                        const percentual = percentuaisAtuais[index];
+                        return (
+                          categorias[index] +
+                          ': R$ ' +
+                          valor.toLocaleString('pt-BR', {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          }) +
+                          ' (' +
+                          percentual.toFixed(2) +
+                          '%)'
+                        );
+                      },
+                    },
+                  },
+                  legend: {
+                    display: true,
+                    labels: {
+                      color: 'white',
                     },
                   },
                 },
-                legend: {
-                  display: true,
-                  labels: {
-                    color: 'white',
-                  },
-                },
-              },
-            }}
-          />
+              }}
+            />
+          </div>
         </div>
       </div>
 
       {/* Conteúdo Principal */}
-      <div className="w-3/4 p-6">
-        <h2 className="text-2xl font-bold mb-6">Portfólio</h2>
-        <table className="w-full table-auto">
-          {/* Cabeçalho da Tabela */}
-          <thead>
-            <tr>
-              <th className="px-4 py-2">Categoria</th>
-              <th className="px-4 py-2">Valor Atual</th>
-              <th className="px-4 py-2">% Atual</th>
-              <th className="px-4 py-2">% Ideal</th>
-              <th className="px-4 py-2">Valor Ideal do Aporte</th>
-            </tr>
-          </thead>
-          {/* Corpo da Tabela */}
-          <tbody>
-            {categorias.map((categoria, index) => (
-              <tr key={index} className="text-center">
-                <td className="border px-4 py-2">{categoria}</td>
-                <td className="border px-4 py-2">
-                  <input
-                    type="text"
-                    className="w-full bg-gray-700 p-2 rounded text-white"
-                    value={formatCurrencyFromDigits(valorAtualInputs[index])}
-                    onChange={(e) => {
-                      const newValorAtualInputs = [...valorAtualInputs];
-                      const inputDigits = e.target.value.replace(/\D/g, '');
-                      newValorAtualInputs[index] = inputDigits;
-                      setValorAtualInputs(newValorAtualInputs);
+      <div className="w-full sm:w-3/4 p-4 sm:p-6">
+        <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">Portfólio</h2>
+        
+        {/* Exibir tabela em telas maiores */}
+        <div className="hidden sm:block">
+          {/* Código da tabela existente */}
+        </div>
+        
+        {/* Exibir cards em telas menores */}
+        <div className="block sm:hidden">
+          {categorias.map((categoria, index) => (
+            <div key={index} className="bg-gray-800 rounded-lg p-4 mb-4">
+              <h3 className="text-lg font-bold mb-2">{categoria}</h3>
+              <div className="mb-2">
+                <label className="block text-sm">Valor Atual</label>
+                <input
+                  type="text"
+                  className="w-full bg-gray-700 p-2 rounded text-white"
+                  value={formatCurrencyFromDigits(valorAtualInputs[index])}
+                  onChange={(e) => {
+                    const newValorAtualInputs = [...valorAtualInputs];
+                    const inputDigits = e.target.value.replace(/\D/g, '');
+                    newValorAtualInputs[index] = inputDigits;
+                    setValorAtualInputs(newValorAtualInputs);
 
-                      // Atualiza o valor em centavos
-                      const newValores = [...valoresAtuais];
-                      newValores[index] = parseInt(inputDigits, 10) || 0;
-                      setValoresAtuais(newValores);
-                    }}
-                  />
-                </td>
-                <td className="border px-4 py-2">
-                  {percentuaisAtuais[index].toFixed(2)}%
-                </td>
-                <td className="border px-4 py-2">
-                  <div className="flex items-center justify-center">
-                    <button
-                      onClick={() => decrementPercentage(index)}
-                      className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-1 px-2 rounded-l h-10"
-                    >
-                      -
-                    </button>
-                    <div className="relative">
-                      <input
-                        type="text"
-                        inputMode="decimal"
-                        className="w-24 bg-gray-700 text-left pl-5 text-white h-10"
-                        value={percentuaisIdeais[index]}
-                        onChange={(e) => {
-                          let value = e.target.value;
-                          const numValue = parsePercentage(value);
-                          const totalOthers = percentuaisIdeais.reduce(
-                            (sum, p, i) =>
-                              i !== index ? sum + parsePercentage(p) : sum,
-                            0
-                          );
-                          if (numValue + totalOthers > 100) {
-                            const maxAllowed = 100 - totalOthers;
-                            value = maxAllowed.toFixed(2).replace('.', ',');
-                          }
-                          const newPercentuais = [...percentuaisIdeais];
-                          newPercentuais[index] = value;
-                          setPercentuaisIdeais(newPercentuais);
-                        }}
-                        onBlur={() => {
-                          const value = percentuaisIdeais[index];
-                          const numValue = parsePercentage(value);
-                          const formattedValue = numValue.toFixed(2).replace('.', ',');
-                          const newPercentuais = [...percentuaisIdeais];
-                          newPercentuais[index] = formattedValue;
-                          setPercentuaisIdeais(newPercentuais);
-                        }}
-                      />
-                      <span className="absolute inset-y-0 right-0 flex items-center pr-2 text-white">
-                        %
-                      </span>
-                    </div>
-                    <button
-                      onClick={() => incrementPercentage(index)}
-                      className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-1 px-2 rounded-r h-10"
-                    >
-                      +
-                    </button>
+                    // Atualiza o valor em centavos
+                    const newValores = [...valoresAtuais];
+                    newValores[index] = parseInt(inputDigits, 10) || 0;
+                    setValoresAtuais(newValores);
+                  }}
+                />
+              </div>
+              <div className="mb-2">
+                <label className="block text-sm">% Atual</label>
+                <p>{percentuaisAtuais[index].toFixed(2)}%</p>
+              </div>
+              <div className="mb-2">
+                <label className="block text-sm">% Ideal</label>
+                <div className="flex items-center">
+                  <button
+                    onClick={() => decrementPercentage(index)}
+                    className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-1 px-2 rounded-l h-10"
+                  >
+                    -
+                  </button>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      inputMode="decimal"
+                      className="w-full md:w-24 bg-gray-700 text-center text-white h-10"
+                      value={percentuaisIdeais[index]}
+                      onChange={(e) => {
+                        let value = e.target.value;
+                        const numValue = parsePercentage(value);
+                        const totalOthers = percentuaisIdeais.reduce(
+                          (sum, p, i) =>
+                            i !== index ? sum + parsePercentage(p) : sum,
+                          0
+                        );
+                        if (numValue + totalOthers > 100) {
+                          const maxAllowed = 100 - totalOthers;
+                          value = maxAllowed.toFixed(2).replace('.', ',');
+                        }
+                        const newPercentuais = [...percentuaisIdeais];
+                        newPercentuais[index] = value;
+                        setPercentuaisIdeais(newPercentuais);
+                      }}
+                      onBlur={() => {
+                        const value = percentuaisIdeais[index];
+                        const numValue = parsePercentage(value);
+                        const formattedValue = numValue.toFixed(2).replace('.', ',');
+                        const newPercentuais = [...percentuaisIdeais];
+                        newPercentuais[index] = formattedValue;
+                        setPercentuaisIdeais(newPercentuais);
+                      }}
+                    />
+                    <span className="absolute inset-y-0 right-0 flex items-center pr-2 text-white">
+                      %
+                    </span>
                   </div>
-                </td>
-                <td className="border px-4 py-2">
+                  <button
+                    onClick={() => incrementPercentage(index)}
+                    className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-1 px-2 rounded-r h-10"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+              <div className="mb-2">
+                <label className="block text-sm">Valor Ideal do Aporte</label>
+                <p>
                   R${' '}
                   {valoresIdeais[index].toLocaleString('pt-BR', {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
